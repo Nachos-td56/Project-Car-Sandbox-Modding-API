@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Car Sandbox Mod Loader Docs</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+  :root {
+    --bg: #0b0d10;
+    --surface: #12151a;
+    --surface2: #1a1e26;
+    --border: #2a303c;
+    --text: #e6eaf0;
+    --muted: #8b93a7;
+    --accent: #4ea1ff;
+    --accent2: #7c5cff;
+    --green: #3dd68c;
+    --orange: #ff9f43;
+    --red: #ff6b6b;
+    --code-bg: #0d1117;
+    --font: "Inter", system-ui, -apple-system, sans-serif;
+    --mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    display: flex;
+    min-height: 100vh;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  nav {
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 16px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  nav .logo {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+  nav .tag {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+  nav h3 {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin: 20px 0 8px;
+  }
+  nav a {
+    display: block;
+    padding: 6px 10px;
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+  }
+  nav a:hover { background: var(--surface2); text-decoration: none; }
+  nav a.active { background: var(--surface2); color: var(--accent); }
+
+  main {
+    flex: 1;
+    max-width: 860px;
+    padding: 48px 40px 120px;
+  }
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .subtitle { color: var(--muted); font-size: 1.05rem; margin-bottom: 40px; }
+  h2 {
+    font-size: 1.45rem;
+    margin: 48px 0 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  h2:first-of-type { border-top: none; margin-top: 0; }
+  h3 { font-size: 1.1rem; margin: 28px 0 10px; color: #c8d0e0; }
+  p { margin-bottom: 14px; color: #c5ccd8; }
+  ul, ol { margin: 0 0 16px 1.4em; color: #c5ccd8; }
+  li { margin-bottom: 6px; }
+  code {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    background: var(--surface2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #9ecbff;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    margin: 14px 0 20px;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.55;
+  }
+  pre code { background: none; padding: 0; color: #d0d7e2; }
+  .badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 99px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .badge-api { background: #1a3a5c; color: var(--accent); }
+  .badge-lua { background: #1a3a2a; color: var(--green); }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin: 16px 0;
+  }
+  .card h4 { font-size: 0.95rem; margin-bottom: 6px; }
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0 22px;
+    font-size: 0.9rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  th { color: var(--muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  td code { font-size: 0.8em; }
+  .sig {
+    font-family: var(--mono);
+    font-size: 0.88rem;
+    color: #9ecbff;
+    background: var(--surface2);
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin: 8px 0 12px;
+    display: block;
+  }
+  .note {
+    border-left: 3px solid var(--accent);
+    background: #0f1a28;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin: 16px 0;
+    font-size: 0.92rem;
+  }
+  .warn {
+    border-left: 3px solid var(--orange);
+    background: #1f160c;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin: 16px 0;
+    font-size: 0.92rem;
+  }
+  .footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  @media (max-width: 900px) {
+    body { flex-direction: column; }
+    nav { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid var(--border); }
+    main { padding: 28px 20px 80px; }
+    .grid2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">Project Car Sandbox</div>
+  <div class="tag">Mod API Docs</div>
+
+  <h3>Getting Started</h3>
+  <a href="#overview">Overview</a>
+  <a href="#mod-structure">Mod Structure</a>
+  <a href="#install">Installing Mods</a>
+  <a href="#quickstart">Quickstart</a>
+
+  <h3>API Reference</h3>
+  <a href="#mod-helper">ModHelper</a>
+  <a href="#asset-helpers">Asset Management</a>
+  <a href="#audio-helpers">Audio Helpers</a>
+  <a href="#transform-helpers">Transforms & Prefabs</a>
+  <a href="#ui-bindings">UI Bindings & Shortcuts</a>
+  <a href="#lifecycle">Update & Event Listeners</a>
+  <a href="#find">FindGameObject</a>
+
+  <h3>Available Types</h3>
+  <a href="#whitelist">Whitelisted Types</a>
+
+  <h3>Examples</h3>
+  <a href="#example-mod">Text Toggle Mod</a>
+  <a href="#patterns">Common Patterns</a>
+</nav>
+
+<main>
+  <h1>Mod Loader Docs</h1>
+  <p class="subtitle">Write Lua mods for Project Car Sandbox, Pack them as <code>.pjcsm</code> files, drop them in the Mods folder, and enjoy.</p>
+
+  <h2 id="overview">Overview</h2>
+  <p>Mods are packaged as Unity <strong>AssetBundles</strong> using the <code>.pjcsm</code> extension. Each mod bundle must include a entry point script, aka a TextAsset explicitly named <code>init</code>. Upon launching the game, the loader automatically scans the mods directory, loads all available bundles, and executes their respective <code>init</code> scripts.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>What you can do</h4>
+      <ul>
+        <li>Interact with Unity core objects, physics, rendering, and UGUI</li>
+        <li>Load textures, audio clips, and other scripts across bundles</li>
+        <li>Instantiate prefabs, control object lifecycles, and manipulate transforms</li>
+        <li>Bind UI buttons, toggles, and sliders cleanly</li>
+        <li>Register per-frame update hooks and non-blocking timers</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>What you cant do/is restricted</h4>
+      <ul>
+        <li>Direct disk I/O (File and Directory operations) is blocked for security</li>
+        <li>Unrestricted system commands or process launching is blocked</li>
+        <li>Only whitelisted C# and Unity types are accessible from Lua</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2 id="mod-structure">Mod Structure</h2>
+  <p>A compiled <code>.pjcsm</code> file is a standard Unity AssetBundle. At minimum, it requires:</p>
+  <pre><code>mycoolmod.pjcsm
+└── init         ← TextAsset containing your Lua entry script</code></pre>
+  
+  <p>You can bundle additional assets and other code files together:</p>
+  <pre><code>mycoolmod.pjcsm
+├── init         ← Required entry script, think of it like linux's init
+├── mytexture    ← Texture2D asset
+├── mysound      ← AudioClip asset
+└── utils        ← Lua script that can be loaded via require()</code></pre>
+
+  <div class="note">
+    Calling <code>require("utils")</code> automatically searches across all currently loaded mod bundles for a matching TextAsset.
+  </div>
+
+  <h2 id="install">Installing Mods</h2>
+  <p>Place your <code>.pjcsm</code> mod file(s) directly into the Mods directory corresponding to your platform:</p>
+  
+  <table>
+    <tr><th>Platform</th><th>Mods Folder Path</th></tr>
+    <tr><td>Windows</td><td><code>Mods\</code> located right next to the game executable</td></tr>
+    <tr><td>Android</td><td><code>/storage/emulated/0/Android/data/com.AKNDO.PJCS/files/Mods/</code><br>(Note: You may need an external file explorer app to access this path due to Android storage permissions)</td></tr>
+  </table>
+  
+  <p>If the Mods directory does not yet exist, simply launch the game once and the game will create it automatically.</p>
+
+  <h2 id="quickstart">Quickstart</h2>
+  <p>Here is a minimal <code>init.lua</code> template to verify your setup:</p>
+  <pre><code>print("[MyMod] Hello from Project Car Sandbox!") -- the [MyMod] tag isnt needed, but its better for workflow
+
+local canvas = CS.ModHelper.FindGameObject("Canvas")
+if canvas then
+    print("Successfully found canvas: " .. canvas.name)
+end</code></pre>
+  
+  <p>Save your script as a TextAsset named <code>init</code> inside a Unity AssetBundle project, package it with the <code>.pjcsm</code> extension, drop it into your Mods folder, and start the game.</p>
+
+  <h2 id="mod-helper">ModHelper <span class="badge badge-api">API</span></h2>
+  <p>The helper exposed to the environment is <code>CS.ModHelper</code>, providing control over execution states, and utility hooks.</p>
+
+  <h3>LoadModBundle</h3>
+  <span class="sig">bool LoadModBundle(string modBundleFileName)</span>
+  <p>Loads a specific <code>.pjcsm</code> bundle from theMods directory into memory by filename. Returns true upon successful loading or if it is already active.</p>
+  <pre><code>CS.ModHelper.Instance:LoadModBundle("expansion.pjcsm")</code></pre>
+
+  <h3>LoadAndRunAllMods</h3>
+  <span class="sig">void LoadAndRunAllMods()</span>
+  <p>Scans the Mods folder, loads all discovered <code>*.pjcsm</code> files, and runs their <code>init</code> entry scripts. This is handled automatically during startup and should not be used unless necessary.</p>
+
+  <h3>UnloadModBundle</h3>
+  <span class="sig">void UnloadModBundle(string modBundleFileName)</span>
+  <p>Unloads a target mod bundle from memory and disposes of its associated assets. Any references pointing to assets inside this bundle will become invalid.</p>
+
+  <h2 id="asset-helpers">Asset Management <span class="badge badge-lua">Lua</span></h2>
+
+  <h3>GetModTexture</h3>
+  <span class="sig">static Texture2D GetModTexture(string assetName)</span>
+  <p>Searches across all loaded mod bundles to retrieve a <code>Texture2D</code> asset by name.</p>
+  <pre><code>local tex = CS.ModHelper.GetModTexture("custom_banner")
+if tex then
+    rawImage.texture = tex
+end</code></pre>
+
+  <h3>GetModAudio</h3>
+  <span class="sig">static AudioClip GetModAudio(string assetName)</span>
+  <p>Searches across all loaded mod bundles to retrieve an <code>AudioClip</code> asset by name.</p>
+  <pre><code>local clip = CS.ModHelper.GetModAudio("custom_sound")
+if clip then
+    CS.ModHelper.PlayAudio(audioSource, clip)
+end</code></pre>
+
+  <h3>Wait (Timers & Coroutines)</h3>
+  <span class="sig">static void Wait(float seconds, LuaFunction callback)</span>
+  <p>Executes a deferred callback function after a specified delay time in seconds without blocking the main thread.</p>
+  <pre><code>CS.ModHelper.Wait(3.5, function()
+    print("3.5 seconds have passed!")
+end)</code></pre>
+
+  <h2 id="audio-helpers">Audio Helpers <span class="badge badge-api">API</span></h2>
+  <p>Convenience methods for managing audio playback safely across platforms:</p>
+
+  <h3>PlayAudio</h3>
+  <span class="sig">static void PlayAudio(AudioSource source, AudioClip clip)</span>
+  <p>Assigns a clip to an AudioSource and starts playback immediately.</p>
+
+  <h3>PlayOneShot</h3>
+  <span class="sig">static void PlayOneShot(AudioSource source, AudioClip clip, float volumeScale = 1f)</span>
+  <p>Plays a single audio clip pass-through at an optional volume scaling factor.</p>
+
+  <h3>StopAudio</h3>
+  <span class="sig">static void StopAudio(AudioSource source)</span>
+  <p>Stops playback on the specified AudioSource component.</p>
+
+  <h3>SetAudioParams</h3>
+  <span class="sig">static void SetAudioParams(AudioSource source, float volume, float pitch)</span>
+  <p>Adjusts both volume and pitch parameters on an AudioSource simultaneously in a single call.</p>
+
+  <h2 id="transform-helpers">Transforms & Prefabs <span class="badge badge-api">API</span></h2>
+  <p>Simplify object creation, destruction, and world adjustments directly from Lua:</p>
+
+  <ul>
+    <li><code>CS.ModHelper.Instantiate(prefab)</code> — Clones a target GameObject prefab.</li>
+    <li><code>CS.ModHelper.InstantiateAt(prefab, position, rotation)</code> — Clones a prefab at specific world coordinates and orientation.</li>
+    <li><code>CS.ModHelper.InstantiateAsChild(prefab, parentTransform)</code> — Instantiates a prefab directly under a designated parent transform.</li>
+    <li><code>CS.ModHelper.Destroy(go)</code> — Safely destroys a target GameObject.</li>
+    <li><code>CS.ModHelper.DestroyDelayed(go, delay)</code> — Destroys a GameObject after a specified time delay.</li>
+    <li><code>CS.ModHelper.SetActive(go, active)</code> — Toggles the active state of a GameObject.</li>
+    <li><code>CS.ModHelper.SetLocalPosition(transform, x, y, z)</code> — Sets local space coordinates.</li>
+    <li><code>CS.ModHelper.SetPosition(transform, x, y, z)</code> — Sets world space coordinates.</li>
+    <li><code>CS.ModHelper.SetLocalScale(transform, x, y, z)</code> — Sets local scaling vectors.</li>
+    <li><code>CS.ModHelper.LookAt(transform, worldPosition)</code> — Rotates a transform to face a target world position.</li>
+    <li><code>CS.ModHelper.SetParent(childTransform, parentTransform, worldPositionStays)</code> — Reparents a transform hierarchy.</li>
+  </ul>
+
+  <h2 id="ui-bindings">UI Bindings & Component Shortcuts <span class="badge badge-lua">Lua</span></h2>
+  <p>Quick lookup shortcuts to streamline component handling without complex type binding:</p>
+
+  <ul>
+    <li><code>CS.ModHelper.GetComponent(go, "TypeName")</code> — Fetches a component by string name.</li>
+    <li><code>CS.ModHelper.AddComponent(go, "TypeName")</code> — Adds a component by string name.</li>
+    <li><code>CS.ModHelper.GetOrAddComponent(go, "TypeName")</code> — Retrieves an existing component or adds one if missing.</li>
+    <li><code>CS.ModHelper.CreateGameObject(name)</code> — Creates a new empty GameObject.</li>
+    <li><code>CS.ModHelper.SetTMPText(tmpTextComponent, text)</code> — Sets text on TextMeshPro components safely.</li>
+    <li><code>CS.ModHelper.SetUIText(uiTextComponent, text)</code> — Sets text on classic UGUI text components.</li>
+    <li><code>CS.ModHelper.SetImageSprite(imageComponent, sprite)</code> — Assigns a sprite to a UI Image.</li>
+    <li><code>CS.ModHelper.SetImageColor(imageComponent, r, g, b, a)</code> — Adjusts UI Image tint colors.</li>
+  </ul>
+
+  <h3>Button, Toggle, and Slider Listeners</h3>
+  <p>Clean helper functions for wiring UI event callbacks:</p>
+  <pre><code>-- Button Click Listener
+CS.ModHelper.AddButtonListener(myButton, function()
+    print("Button was clicked!")
+end)
+
+-- Toggle Value Listener
+CS.ModHelper.AddToggleListener(myToggle, function(isOn)
+    print("Toggle state changed: " .. tostring(isOn))
+end)
+
+-- Slider Value Listener
+CS.ModHelper.AddSliderListener(mySlider, function(val)
+    print("Slider value updated: " .. val)
+end)</code></pre>
+
+  <h2 id="lifecycle">Update & Event Listeners <span class="badge badge-api">API</span></h2>
+  <p>Register custom per-frame loops using <code>AddUpdateListener</code> and safely clean them up when unloading via <code>RemoveUpdateListener</code>.</p>
+  
+  <pre><code>local myUpdateCallback = nil
+myUpdateCallback = function()
+    -- Runs every frame
+end
+
+-- Register to the main update ticker
+CS.ModHelper.AddUpdateListener(myUpdateCallback)
+
+-- To unregister later:
+-- CS.ModHelper.RemoveUpdateListener(myUpdateCallback)</code></pre>
+
+  <h2 id="find">FindGameObject</h2>
+  <span class="sig">static GameObject FindGameObject(string goName)</span>
+  <p>Finds any target GameObject by name across the scene graph, including hidden or inactive objects.</p>
+  
+  <pre><code>local uiObject = CS.ModHelper.FindGameObject("MainUI") 
+    or CS.ModHelper.FindGameObject("Canvas")</code></pre>
+
+  <h2 id="whitelist">Whitelisted Types</h2>
+  <p>The helper exposes a list of safe C# and Unity types to the runtime environment. Any type not in this list is restricted.</p>
+
+  <h3>Math & Structs</h3>
+  <p><code>Vector2</code> <code>Vector2Int</code> <code>Vector3</code> <code>Vector3Int</code> <code>Vector4</code> <code>Quaternion</code> <code>Matrix4x4</code> <code>Color</code> <code>Color32</code> <code>Mathf</code> <code>Time</code> <code>Random</code> <code>Rect</code> <code>RectOffset</code> <code>Bounds</code> <code>BoundsInt</code> <code>Plane</code> <code>Ray</code> <code>Ray2D</code> <code>RaycastHit</code> <code>RaycastHit2D</code> <code>AnimationCurve</code> <code>Keyframe</code></p>
+
+  <h3>Scene & GameObjects</h3>
+  <p><code>Object</code> <code>GameObject</code> <code>Transform</code> <code>RectTransform</code> <code>Component</code> <code>Behaviour</code> <code>MonoBehaviour</code> <code>Debug</code> <code>SceneManager</code> <code>Scene</code> <code>GameObject[]</code> <code>Component[]</code> <code>Vector3[]</code></p>
+
+  <h3>Input Systems</h3>
+  <p><code>Input</code> <code>KeyCode</code> <code>Touch</code> <code>TouchPhase</code> <code>UnityEngine.InputSystem.Keyboard</code> <code>UnityEngine.InputSystem.Key</code></p>
+
+  <h3>Physics & Colliders</h3>
+  <p><code>Physics</code> <code>Physics2D</code> <code>Rigidbody</code> <code>Rigidbody2D</code> <code>Collider</code> <code>Collider2D</code> <code>BoxCollider</code> <code>BoxCollider2D</code> <code>SphereCollider</code> <code>CircleCollider2D</code> <code>CapsuleCollider</code> <code>CapsuleCollider2D</code> <code>MeshCollider</code></p>
+
+  <h3>Rendering & Visuals</h3>
+  <p><code>Camera</code> <code>Light</code> <code>LightType</code> <code>Material</code> <code>Shader</code> <code>Texture</code> <code>Texture2D</code> <code>RenderTexture</code> <code>Sprite</code> <code>Mesh</code> <code>MeshFilter</code> <code>MeshRenderer</code> <code>SkinnedMeshRenderer</code> <code>ParticleSystem</code> <code>LineRenderer</code> <code>TrailRenderer</code></p>
+
+  <h3>Audio & Animation</h3>
+  <p><code>AudioSource</code> <code>AudioClip</code> <code>AudioListener</code> <code>Animator</code> <code>RuntimeAnimatorController</code> <code>AnimationClip</code></p>
+
+  <h3>UGUI & Layout Groups</h3>
+  <p><code>Canvas</code> <code>CanvasGroup</code> <code>CanvasScaler</code> <code>HorizontalLayoutGroup</code> <code>VerticalLayoutGroup</code> <code>GridLayoutGroup</code> <code>ContentSizeFitter</code> <code>LayoutElement</code> <code>LayoutRebuilder</code> <code>Text</code> <code>Image</code> <code>RawImage</code> <code>Button</code> <code>Slider</code> <code>Toggle</code> <code>ToggleGroup</code> <code>ScrollRect</code> <code>Dropdown</code> <code>InputField</code> <code>Mask</code> <code>RectMask2D</code> <code>EventSystem</code> <code>PointerEventData</code> <code>Cursor</code> <code>Screen</code> <code>Gradient</code> <code>GradientColorKey</code> <code>GradientAlphaKey</code></p>
+
+  <h3>TextMeshPro</h3>
+  <p><code>TMP_Text</code> <code>TextMeshPro</code> <code>TextMeshProUGUI</code> <code>TMP_InputField</code> <code>TMP_Dropdown</code></p>
+
+  <h3>System Utilities & Manager</h3>
+  <p><code>Type</code> <code>String</code> <code>DateTime</code> <code>TimeSpan</code> <code>Math</code> <code>JsonUtility</code> <code>StringBuilder</code> <code>WaitForSeconds</code> <code>Coroutine</code> + <code>ModHelper</code></p>
+
+  <h2 id="example-mod">Example — Text Toggle Mod</h2>
+  <p>A functional example mod demonstrating how to locate existing UI elements, build custom overlay panels, bind click listeners, and handle keyboard input via per-frame updates.</p>
+
+  <pre><code>-- ============================================================
+-- Basic Text Toggle Mod (Free to be modified and or used)
+-- ============================================================
+local CS = CS
+local UnityEngine = CS.UnityEngine
+local UI = CS.UnityEngine.UI
+local TMPro = CS.TMPro
+local ModHelper = CS.ModHelper
+local Keyboard = CS.UnityEngine.InputSystem.Keyboard
+
+local originalText = "NOTE: UI IS NOT FINISHED"
+local moddedText   = "Modded Menu"
+local usingModded  = true
+local menuVisible  = false
+local noteTMP = nil
+local menuRoot = nil
+
+local function find(name)
+    return ModHelper.FindGameObject(name)
+end
+
+local function makeUI(name, parent)
+    local go = UnityEngine.GameObject(name, typeof(UnityEngine.RectTransform))
+    if parent then
+        go.transform:SetParent(parent.transform, false)
+    end
+    return go, go:GetComponent(typeof(UnityEngine.RectTransform))
+end
+
+local function addImage(go, color)
+    local img = go:AddComponent(typeof(UI.Image))
+    if color then img.color = color end
+    return img
+end
+
+local function addTMP(go, text, size)
+    local tmp = go:AddComponent(typeof(TMPro.TextMeshProUGUI))
+    tmp.text = text or ""
+    tmp.fontSize = size or 22
+    tmp.alignment = TMPro.TextAlignmentOptions.Center
+    tmp.color = UnityEngine.Color.white
+    return tmp
+end
+
+local function setSize(rt, w, h)
+    rt.sizeDelta = UnityEngine.Vector2(w, h)
+end
+
+local function setPos(rt, x, y)
+    rt.anchoredPosition = UnityEngine.Vector2(x, y)
+end
+
+local function stretchFull(rt)
+    rt.anchorMin = UnityEngine.Vector2(0, 0)
+    rt.anchorMax = UnityEngine.Vector2(1, 1)
+    rt.offsetMin = UnityEngine.Vector2.zero
+    rt.offsetMax = UnityEngine.Vector2.zero
+    rt.localScale = UnityEngine.Vector3.one
+end
+
+local function ApplyText()
+    if not noteTMP then return end
+    noteTMP.text = usingModded and moddedText or originalText
+    ModHelper.Log("Text set to: " .. noteTMP.text)
+end
+
+local function BuildMenu()
+    local hostCanvas = find("MainUI") or find("UtilUI") or find("cube") or find("Canvas")
+    if not hostCanvas then
+        ModHelper.LogWarning("No Overlay canvas found – aborting menu build")
+        return
+    end
+
+    local root, rootRT = makeUI("TextToggleMenuRoot", hostCanvas)
+    stretchFull(rootRT)
+
+    local panel, pRT = makeUI("Panel", root)
+    pRT.anchorMin = UnityEngine.Vector2(0.5, 0.5)
+    pRT.anchorMax = UnityEngine.Vector2(0.5, 0.5)
+    pRT.pivot = UnityEngine.Vector2(0.5, 0.5)
+    setSize(pRT, 420, 220)
+    setPos(pRT, 0, 0)
+    addImage(panel, UnityEngine.Color(0.08, 0.08, 0.12, 0.95))
+
+    local titleGO, tRT = makeUI("Title", panel)
+    addTMP(titleGO, "Text Toggle Menu", 26)
+    setSize(tRT, 380, 40)
+    setPos(tRT, 0, 70)
+
+    local statusGO, sRT = makeUI("Status", panel)
+    local status = addTMP(statusGO, "Currently: Modded", 18)
+    setSize(sRT, 380, 30)
+    setPos(sRT, 0, 25)
+
+    local btnGO, bRT = makeUI("ToggleBtn", panel)
+    setSize(bRT, 280, 55)
+    setPos(bRT, 0, -40)
+    addImage(btnGO, UnityEngine.Color(0.25, 0.45, 0.7, 1))
+    local btn = btnGO:AddComponent(typeof(UI.Button))
+
+    local labelGO, lRT = makeUI("Label", btnGO)
+    addTMP(labelGO, "Switch Text", 22)
+    stretchFull(lRT)
+
+    ModHelper.AddButtonListener(btn, function()
+        usingModded = not usingModded
+        ApplyText()
+        status.text = usingModded and "Currently: Modded" or "Currently: Original"
+    end)
+
+    local hintGO, hRT = makeUI("Hint", panel)
+    addTMP(hintGO, "Press F8 to hide/show this menu", 14)
+    setSize(hRT, 380, 25)
+    setPos(hRT, 0, -90)
+
+    menuRoot = root
+    menuRoot:SetActive(false)
+end
+
+-- Update listener callback
+local function Update()
+    local kb = Keyboard.current
+    if kb ~= nil and kb.f8Key.wasPressedThisFrame then
+        menuVisible = not menuVisible
+        if menuRoot then
+            menuRoot:SetActive(menuVisible)
+        end
+    end
+end
+
+-- Entry point execution
+local noteGO = find("uinotfinished")
+if noteGO then
+    noteTMP = noteGO:GetComponent(typeof(TMPro.TextMeshProUGUI))
+    if noteTMP then ApplyText() end
+end
+
+BuildMenu()
+ModHelper.AddUpdateListener(Update)
+ModHelper.Log("TextToggleMod ready, F8 to toggle menu")</code></pre>
+
+  <h2 id="patterns">Common Patterns</h2>
+
+  <h3>Safely Fetch Components</h3>
+  <pre><code>local go = CS.ModHelper.FindGameObject("SomeObject")
+if go then
+    local tmp = go:GetComponent(typeof(TMPro.TextMeshProUGUI))
+    if tmp then
+        tmp.text = "Updated text value"
+    end
+end</code></pre>
+
+  <h3>Check Input System Keys</h3>
+  <pre><code>local kb = CS.UnityEngine.InputSystem.Keyboard.current
+if kb and kb.f8Key.wasPressedThisFrame then
+    -- Execute action on keypress
+end</code></pre>
+
+  <h3>Require External Scripts</h3>
+  <pre><code>-- Requires a TextAsset named "utils" bundled inside your/a mod
+local utils = require("utils")
+utils.doSomething()</code></pre>
+
+  <div class="footer">
+    Project Car Sandbox · Mod Helper Docs<br>
+    Need a new type added to the whitelist? Let the developer know.<br><br>
+    The modding system is actively being worked on and expanding. Please report any bugs or unexpected behavior!<br>
+	- Nachos (aka the creator)...websites are hard
+  </div>
+</main>
+</body>
+</html>
